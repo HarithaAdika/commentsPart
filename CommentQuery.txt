@@ -1,0 +1,10 @@
+
+************* Getting Commnets************************
+
+db.users.aggregate([{ $project: { "userName":1,"posts.postId":1,"posts.comments": 1 } },{$unwind:"$posts"},{ $match:{$and:[{"userName":"pawwi"},{ "posts.postId": "9ae62648-25e4-4661-8d9d-0ace1f9192b6" }]} } ]);
+
+
+***********Posting Comments*********************************
+
+
+db.users.update({$and:[{"userName":"pawwi"},{"posts.postId":"9ae62648-25e4-4661-8d9d-0ace1f9192b6"}]},{$push:{"posts.0.comments": { $each: [ { "commentBy": "sayli", "content": "gd evening","timestamp":new Date() } ,{ "commentBy": "surabhi", "content": "gd evening","timestamp":new Date() }]}}}) ;

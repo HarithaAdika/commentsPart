@@ -1,0 +1,83 @@
+const express = require('express')
+const app = express()
+const conn = require('./comments')
+const parser=require('body-parser')
+const Dao = require('./modules/data-access/data-access')
+const connection = new conn();
+const dao = new Dao()
+app.get('/rest/api/users/get/:id', async (req, res) => {
+    let pId= eval(req.params.id);
+    //let query = [{ $project: { "userId":1,"posts.comments": 1 ,"posts.postid":1} }]
+    let result = await connection.getComments("commentsCollection",pId);
+    res.send(result);
+    /*
+    var array = []
+    var x
+    for (var i = 0; i < result.length; i++) {
+        var temp = result[i].posts
+        for (var j = 0; j < temp.length; j++) {
+            temp.map(t => {
+                x = {
+                    "_id": t.postid,
+                    "comments": t.comments
+                }
+                array.push(x)
+            })
+            
+        }
+    }
+
+    console.log(array);
+    res.send(array);
+*/
+
+
+})
+/***************post perticular********/
+
+// app.get('/rest/api/users/getPost/', async (req, res) => {
+//     let query = [{ $project: { "posts.comments": 1 ,"posts.postid":1} }]
+//     let result = await dao.aggregate("commentsCollection", query)
+//     res.send(result);
+
+// })
+
+
+// app.get('/rest/api/users/get/', async (req, res) => {
+//     let result = await dao.find("commentsCollection",{"userId":1001})
+//     for(var i=0;i<result.length;i++){
+//          res.send(result[i].posts[i].comments);
+//     }
+   
+   
+// })
+
+
+
+app.use(parser.json());
+
+app.put('/rest/api/users/update/:uame/:pid', async (req, res) => {
+    let result
+    let u=req.params['uame'];
+    let p=eval(req.params.pid)
+    // let query={$and:[{"userName":u},{"posts.postId":p}]};
+    //console.log(req.params.uid);
+    //console.log(req.body.posts[0].comments);
+   
+    // let newquery={$push:{"posts.$.comments":{"commentBy":req.body.name,"content":req.body.content,"timestamp":new Date()}}}
+     
+        // console.log(req.params.uame); 
+        // console.log(req.params.pid); 
+    try {
+         let result = await connection.postComments("commentsCollection",u,p,req.body) 
+          res.send(result) 
+    }
+    catch (err) {
+        result = { err: err }
+    }
+    
+   
+})
+
+
+app.listen('8080', () => console.log('Listening on port 8080'))
